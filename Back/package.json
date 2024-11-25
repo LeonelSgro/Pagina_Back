@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "express-generator-typescript": "^2.4.25",
-    "find": "^0.3.0",
-    "jasmine": "^5.4.0",
-    "supertest": "^7.0.0"
-  }
-}
