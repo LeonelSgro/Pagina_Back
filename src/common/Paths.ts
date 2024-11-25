@@ -10,12 +10,5 @@ export default {
     Add: '/add',
     Update: '/update',
     Delete: '/delete/:id',
-  },
-  Usuario: {
-    Base:'/usuarios',
-    Get:'',
-    Add:'',
-    Update:'',
-    Delete:'',
-  },
+  }
 } as const;

@@ -50,7 +50,7 @@ describe('UserRouter', () => {
     `of "${HttpStatusCodes.OK}" if the request was successful.`, (done) => {
       // Add spy
       const data = getDummyUsers();
-      spyOn(UserRepo, 'getAll').and.resolveTo(data);
+      jest.spyOn(UserRepo, 'getAll').mockResolvedValue(data);
       // Call API
       api(res => {
         expect(res.status).toBe(HttpStatusCodes.OK);
@@ -77,7 +77,7 @@ describe('UserRouter', () => {
     it(`should return a status code of "${HttpStatusCodes.CREATED}" if the ` + 
     'request was successful.', (done) => {
       // Spy
-      spyOn(UserRepo, 'add').and.resolveTo();
+      jest.spyOn(UserRepo, 'add').mockResolvedValueOnce();
       // Call api
       callApi(DUMMY_USER, res => {
         expect(res.status).toBe(HttpStatusCodes.CREATED);
@@ -115,8 +115,8 @@ describe('UserRouter', () => {
     it(`should return a status code of "${HttpStatusCodes.OK}" if the ` + 
     'request was successful.', (done) => {
       // Setup spies
-      spyOn(UserRepo, 'update').and.resolveTo();
-      spyOn(UserRepo, 'persists').and.resolveTo(true);
+      jest.spyOn(UserRepo, 'update').mockResolvedValueOnce();
+      jest.spyOn(UserRepo, 'persists').mockResolvedValueOnce(true);
       // Call api
       callApi(DUMMY_USER, res => {
         expect(res.status).toBe(HttpStatusCodes.OK);
@@ -162,8 +162,8 @@ describe('UserRouter', () => {
     it(`should return a status code of "${HttpStatusCodes.OK}" if the ` + 
     'request was successful.', (done) => {
       // Setup spies
-      spyOn(UserRepo, 'delete').and.resolveTo();
-      spyOn(UserRepo, 'persists').and.resolveTo(true);
+      jest.spyOn(UserRepo, 'delete').mockResolvedValueOnce();
+      jest.spyOn(UserRepo, 'persists').mockResolvedValueOnce(true);
       // Call api
       callApi(5, res => {
         expect(res.status).toBe(HttpStatusCodes.OK);
