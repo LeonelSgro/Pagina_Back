@@ -2,15 +2,15 @@
   "name": "express-gen-ts",
   "version": "0.0.0",
   "scripts": {
-    "build": "set NODE_ENV=development&& npx ts-node ./src",
-    "dev": "NODE_ENV=development npx ts-node ./src",
-    "dev:hot": "nodemon --exec \"npm run dev\" --watch ./src -e ts",
-    "lint": "npx eslint ./src",
-    "lint:tests": "npx eslint ./spec",
-    "start": "NODE_ENV=production node -r ./preload.js ./dist",
-    "test": "npx jest",
-    "test:hot": "nodemon --exec \"npm run test\" --watch ./src --watch ./spec -e ts"
-  },
+  "build": "tsc",
+  "dev": "NODE_ENV=development npx ts-node ./src",
+  "dev:hot": "nodemon --exec \"npm run dev\" --watch ./src -e ts",
+  "lint": "npx eslint ./src",
+  "lint:tests": "npx eslint ./spec",
+  "start": "NODE_ENV=production node -r ./preload.js ./dist",
+  "test": "npx jest",
+  "test:hot": "nodemon --exec \"npm run test\" --watch ./src --watch ./spec -e ts"
+} ,
   "engines": {
     "node": ">=16.0.0"
   },
