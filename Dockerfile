@@ -1,23 +1,23 @@
 # Base de Node.js
 FROM node:18-alpine
 
-# Establecer una variable de entorno para evitar generar logs excesivos durante npm install
-ENV NODE_ENV=production
-
-# Configurar el directorio de trabajo
+# Establecer el directorio de trabajo
 WORKDIR /app
 
 # Copiar y validar dependencias
 COPY package*.json ./
 
-# Instalar solo dependencias de producción para reducir el tamaño final de la imagen
-RUN npm ci --only=production
+# Instalar todas las dependencias (incluye desarrollo para permitir el build)
+RUN npm ci
 
 # Copiar el resto del código fuente
 COPY . .
 
-# Compilar el proyecto (si usa TypeScript o alguna herramienta de build)
+# Compilar el proyecto (usando TypeScript)
 RUN npm run build
+
+# Eliminar dependencias de desarrollo para reducir el tamaño de la imagen
+RUN npm prune --production
 
 # Exponer el puerto que usa la app
 EXPOSE 3000
