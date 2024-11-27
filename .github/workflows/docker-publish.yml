@@ -42,8 +42,8 @@ jobs:
       # Paso 5: Ejecutar pruebas
       - name: Run Tests
         run: npx jest
-  
-   build:
+
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
