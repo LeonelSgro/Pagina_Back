@@ -1,26 +1,31 @@
-# Base de Node.js
-FROM node:18-alpine
+FROM node:20-alpine as build
 
-# Establecer el directorio de trabajo
 WORKDIR /app
-
-# Copiar y validar dependencias
-COPY package*.json ./
-
-# Instalar todas las dependencias (incluye desarrollo para permitir el build)
+COPY package.json ./
+COPY package-lock.json ./
 RUN npm ci
-
-# Copiar el resto del código fuente
 COPY . .
-
-# Compilar el proyecto (usando TypeScript)
 RUN npm run build
 
-# Eliminar dependencias de desarrollo para reducir el tamaño de la imagen
-RUN npm prune --production
+FROM node:20-alpine as production
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 
-# Exponer el puerto que usa la app
+WORKDIR /app
+
+COPY package.json ./
+RUN npm install --only=production
+
+COPY --from=build /app/dist ./dist
+
+ENV PORT=3000
+ENV HOST=0.0.0.0
+ENV NODE_ENV=production
+ENV JET_LOGGER_MODE=CONSOLE
+ENV JET_LOGGER_FILEPATH=jet-logger.log
+ENV JET_LOGGER_TIMESTAMP=TRUE
+ENV JET_LOGGER_FORMAT=LINE
+
+CMD ["node", "dist/index.js"]
+
 EXPOSE 3000
-
-# Comando para iniciar la app
-CMD ["npm", "start"]
