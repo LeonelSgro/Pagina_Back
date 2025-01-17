@@ -1,1 +1,22 @@
-{"users":[{"id":773325148111,"name":"adasdasd","email":"adadada","created":"2024-11-25T16:46:08.111Z"}]}
+{
+    "users": [
+        {
+            "id": 773325148111,
+            "name": "adasdasd",
+            "email": "adadada",
+            "created": "2024-11-25T16:46:08.111Z"
+        },
+        {
+            "id": 79214631028,
+            "name": "ffortnite gordaaaa",
+            "email": "trolaaaaassss",
+            "created": "2025-01-17T18:50:27.143Z"
+        },
+        {
+            "id": 247164973934,
+            "name": "dasdasdad",
+            "email": "asdadadsdasdasd",
+            "created": "2025-01-17T22:45:33.836Z"
+        }
+    ]
+}

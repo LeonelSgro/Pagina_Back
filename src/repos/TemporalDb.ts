@@ -1,33 +1,25 @@
-
-
 import jsonfile from 'jsonfile';
-
-import { IUser } from '@src/models/User';
+import { Userinterface } from '@src/models/Users';
 
 // **** Variables **** //
 
-const DB_FILE_NAME = 'database.json';
+const DB_FILE_NAME = 'TemporalDatabase.json';
 
 
 // **** Types **** //
 
 interface IDb {
-  users: IUser[];
+  users: Userinterface[];
 }
-
 
 // **** Functions **** //
 
-/**
- * Fetch the json from the file.
- */
+/*Fetch the json from the file.*/
 function openDb(): Promise<IDb> {
   return jsonfile.readFile(__dirname + '/' + DB_FILE_NAME) as Promise<IDb>;
 }
 
-/**
- * Update the file.
- */
+/* Update the file.*/
 function saveDb(db: IDb): Promise<void> {
   return jsonfile.writeFile((__dirname + '/' + DB_FILE_NAME), db);
 }
