@@ -25,6 +25,7 @@ userRouter.delete(Paths.Users.Delete, UserRoutes.delete);
 
 // Get all users
 UsersRouter.get(Paths.Users2.Get, UsersRouts.getAll);
+UsersRouter.get(Paths.Users2.GetOne, UsersRouts.getOne);
 UsersRouter.post(Paths.Users2.Add, UsersRouts.add);
 UsersRouter.put(Paths.Users2.Update, UsersRouts.update);
 UsersRouter.delete(Paths.Users2.Delete, UsersRouts.delete);

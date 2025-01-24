@@ -1,82 +1,111 @@
 import { getRandomInt } from '@src/util/misc';
-import { Userinterface } from '@src/models/Users';
-import TemporalDb from './TemporalDb';
+import { IUserDocument } from './MongooseSchema';
+import { UserModel } from './MongooseSchema';
+import { Console } from 'console';
+
 
 // **** Functions **** //
 
-/* See if a user with the given id exists */
-async function persists(id: number): Promise<boolean> {
-  const db = await TemporalDb.openDb();
-  for (const user of db.users) {
-    if (user.id === id) {
-      return true;
+/** Check if a user with the given id exists */
+async function persists(id: string): Promise<boolean> {
+  try {
+    const userExists = await UserModel.exists({ _id: id });
+    return !!userExists;
+  } catch (error) {
+    console.error('Error checking user existence:', error);
+    return false;
+  }
+}
+
+/** Get all users */
+async function getAll(): Promise<IUserDocument[]> {
+  try {
+    const users = await UserModel.find();
+    return users;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return [];
+  }
+}
+
+/** Get one user by id */
+async function getOne(id: string): Promise<IUserDocument | null> {
+  try {
+    const user = await UserModel.findOne({ _id: id });
+    return user;
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return null;
+  }
+}
+
+/** Add a new user */
+async function add(user: Omit<IUserDocument, 'id' | '_id'>): Promise<IUserDocument | null> {
+  try {
+    const newUser = new UserModel(user);
+    const savedUser = await newUser.save();
+    return savedUser;
+  } catch (error) {
+    console.error('Error adding user:', error);
+    return null;
+  }
+}
+
+async function update(data: { user: Partial<IUserDocument> & { id: string } }) {
+  try {
+    // Desestructurar el usuario desde el objeto
+    const { user } = data;
+
+    // Validar los campos requeridos
+    if (!user.id || !user.name || !user.gmail) {
+      console.error('Missing required fields: id, name, or gmail');
+      return null;
     }
-  }
-  return false;
-}
 
-/* Get all users.*/
-async function getAll(): Promise<Userinterface[]> {
-    const db = await TemporalDb.openDb();
-    return db.users;
-  }
+    // Construir el objeto de actualización
+    const updateData: Partial<IUserDocument> = {};
+    if (user.name) updateData.name = user.name;
+    if (user.gmail) updateData.gmail = user.gmail;
+    if (user.clothes) updateData.clothes = user.clothes;
+    if (user.Admin !== undefined) updateData.Admin = user.Admin;
 
-/* Get one user.*/
+    // Actualizar el documento en la base de datos
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      user.id,
+      { $set: updateData },
+      { new: true }
+    );
 
-async function getOne(id: number): Promise<Userinterface | null> {
-  const db = await TemporalDb.openDb();
-  for (const user of db.users) {
-    if (user.id === id) {
-      return user;
+    if (!updatedUser) {
+      console.error(`User with ID ${user.id} not found`);
+      return null;
     }
-  }
-  return null;
-}
 
-/* Add one user.*/
-async function add(user: Userinterface): Promise<void> {
-  const db = await TemporalDb.openDb();
-  user.id = getRandomInt();
-  db.users.push(user);
-  return TemporalDb.saveDb(db);
-}
-
-/* Update a user */ /*verificar como seria porque se tiene que metera al usuario para poder modificar la ropa*/
-async function update(user: Userinterface): Promise<void> {
-  const db = await TemporalDb.openDb();
-  for (let i = 0; i < db.users.length; i++) {
-    if (db.users[i].id === user.id) {
-      const dbUser = db.users[i];
-      db.users[i] = {
-        ...dbUser,
-        name: user.name,
-        gmail: user.gmail,
-      };
-      return TemporalDb.saveDb(db);
-    }
+    console.log('Updated user:', updatedUser);
+    return updatedUser;
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return null;
   }
 }
 
-
-/* Delete one user.*/
-async function delete_(id: number): Promise<void> {
-  const db = await TemporalDb.openDb();
-  for (let i = 0; i < db.users.length; i++) {
-    if (db.users[i].id === id) {
-      db.users.splice(i, 1);
-      return TemporalDb.saveDb(db);
-    }
+/** Delete one user */
+async function delete_(id: string): Promise<boolean> {
+  try {
+    const result = await UserModel.findByIdAndDelete(id);
+    return !!result; // Return true if a document was deleted
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return false;
   }
 }
-
 
 // **** Export default **** //
-
 export default {
-    getOne,
-    persists,
-    getAll,
-    add,
-    update,
-    delete: delete_,
-  } as const;
+  persists,
+  getAll,
+   getOne,
+  add,
+  update,
+  delete: delete_,
+} as const;

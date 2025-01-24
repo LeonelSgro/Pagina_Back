@@ -10,7 +10,7 @@ const INVALID_CONSTRUCTOR_PARAM = 'nameOrObj arg must a string or an object ' +
   // **** Types **** //
 
 export interface Userinterface {
-    id: number;
+    id: string;
     name: string;
     gmail: string;
     password: string;
@@ -28,10 +28,10 @@ function new_(
   gmail?: string,
   password?: string,
   clothes?: PostsInterface[], // Define clothes as an array of Posts
-  id?: number, // id last cause usually set by db
+  id?: string, // id last cause usually set by db
 ): Userinterface {
   return {
-    id: id ?? -1,
+    id: id ?? '',
     name: name ?? '',
     gmail: gmail ?? '',
     password: password ?? '',
@@ -45,7 +45,7 @@ function isUser(arg: unknown): arg is Userinterface {
   return (
     !!arg &&
     typeof arg === 'object' &&
-    'id' in arg && typeof (arg as Userinterface).id === 'number' &&
+    'id' in arg && typeof (arg as Userinterface).id === 'string' &&
     'gmail' in arg && typeof (arg as Userinterface).gmail === 'string' &&
     'name' in arg && typeof (arg as Userinterface).name === 'string' &&
     'password' in arg && typeof (arg as Userinterface).password === 'string' &&
