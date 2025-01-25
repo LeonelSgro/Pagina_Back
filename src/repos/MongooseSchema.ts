@@ -5,10 +5,10 @@ import { PostsInterface } from '@src/models/Posts';
 
 // Define the Posts schema (for the 'clothes' field)
 const PostsSchema: Schema = new Schema({
-  id: { type: Number, required: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },
+  images: { type: [String], default: [] },
   createdAt: {
     type: Date,
     required: true,
@@ -17,13 +17,27 @@ const PostsSchema: Schema = new Schema({
       message: 'Invalid date format',
     },
   },
+}, { 
+  collection: 'posts', 
+  versionKey: false,
+  toJSON: {
+    virtuals: true, // Habilita los virtuales al convertir a JSON
+    transform: (_, ret) => {
+      // Crear el campo id basado en _id
+      ret.id = ret._id.toString();
+      delete ret._id; // Elimina el campo _id del resultado JSON
+      return ret;
+    }
+  },
+  toObject: { virtuals: true }, // Opcional: para compatibilidad con toObject
 });
+
 
 // Define el esquema de usuario
 const UserSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
-    gmail: { type: String, required: true},
+    gmail: { type: String, required: true, unique: true},
     password: { type: String, required: true },
     clothes: { type: [PostsSchema], default: [] },
     Admin: { type: Boolean, default: false },
@@ -62,6 +76,7 @@ export interface IPostDocument extends Document {
   title: string;
   description: string;
   price: number;
+  images: String[];
   createdAt: Date;
 }
 
@@ -75,5 +90,5 @@ db.once('open', () => console.log('Database connected'));
 
 // Mongoose Models
 export const UserModel: Model<IUserDocument> = db.model<IUserDocument>('User', UserSchema);
-export const PostModel: Model<IPostDocument> = db.model<IPostDocument>('Post', PostsSchema);
+export const PostModel: Model<IPostDocument> = db.model<IPostDocument>('posts', PostsSchema);
 

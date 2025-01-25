@@ -29,7 +29,6 @@ function toUserInterface(doc: any): Userinterface {
  * Map `Userinterface` to `IUserDocument` without `_id` or `id`.
  */
 
-
 function toIUserDocument(user: Userinterface): Omit<IUserDocument, '_id' | 'id'> {
   // Create a new document using Mongoose Model (and omit id/_id for custom implementation)
   return new UserModel({
