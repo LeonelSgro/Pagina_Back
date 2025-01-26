@@ -39,7 +39,26 @@ const UserSchema: Schema = new Schema(
     name: { type: String, required: true },
     gmail: { type: String, required: true, unique: true},
     password: { type: String, required: true },
-    clothes: { type: [PostsSchema], default: [] },
+    clothes: { type: [
+      
+          new Schema({
+              id: {type: String, required: true},
+              title: { type: String, required: true },
+              description: { type: String, required: true },
+               price: { type: Number, required: true },
+               images: { type: [String], default: [] },
+               createdAt: {
+                type: Date,
+               required: true,
+               validate: {
+                validator: (value: Date) => moment(value).isValid(),
+               message: 'Invalid date format',
+               }}},
+            { _id: false } // Prevents automatic _id generation for subdocuments
+          )
+        ],
+
+     default: []},
     Admin: { type: Boolean, default: false },
   },
   { 

@@ -41,28 +41,45 @@ import check from './common/check';
    * Add one user.
    */
   async function add(req: IReq, res: IRes) {
-    const {id} = (req.params);
-    const post = check.isValid(req.body, 'post', Posts.itsaPost);
-    await PostsService.add(post, String(id));
-    res.status(HttpStatusCodes.CREATED).end();
+    try {
+      const { id: userId } = req.params; // Extract user ID from the request params
+      console.log(req.body)
+      const post = check.isValid(req.body, 'post', Posts.itsaPost); // Validate the post data //aca esta el error LCDTPM
+      const createdPost = await PostsService.add(post, String(userId)); // Call service layer
+  
+      res.status(HttpStatusCodes.CREATED).json({ post: createdPost }); // Return created post
+    } catch (error) {
+      console.error('Error adding post:', error);
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    }
   }
+  
   
   /**
    * Update one user.
    */
   async function update(req: IReq, res: IRes) {
-   // const user = check.isValid(req.body, 'user', Users.isUser);
-   // await UsersService.updateOne(user);
-    //res.status(HttpStatusCodes.OK).end();
+    try {
+      const { id: postId } = req.params; // Assuming `postId` and `userId` are passed as route parameters
+      const updatedPost = check.isValid(req.body, 'post', Posts.itsaPost); // Validate the incoming data
+      await PostsService.update(String(postId), updatedPost);
+      res.status(HttpStatusCodes.OK).end(); // Respond with 200 status code on success
+    } catch (error) {
+      console.error('Error updating post:', error);
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({ error: error.message });
+    }
   }
+  
+  
+  
   
   /**
    * Delete one user.
    */
   async function delete_(req: IReq, res: IRes) {
-   // const id = check.isNum(req.params, 'id');
-    //await UsersService.delete(id);
-    //res.status(HttpStatusCodes.OK).end();
+    const { id: postId } = req.params;
+    await PostsService.delete(String(postId));
+    res.status(HttpStatusCodes.OK).end();
  }
 
 
@@ -72,5 +89,7 @@ export default {
     getAll,
     getOne,
     add,
+    update,
+    delete: delete_,
   } as const;
   

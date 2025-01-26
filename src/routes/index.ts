@@ -37,8 +37,8 @@ UsersRouter.delete(Paths.Users2.Delete, UsersRouts.delete);
 PostROuter.get(Paths.Posts.Get, PostsRouts.getAll);
 PostROuter.get(Paths.Posts.GetOne, PostsRouts.getOne);
 PostROuter.post(Paths.Posts.Add, PostsRouts.add);
-//PostROuter.put(Paths.Posts.Update, PostsRouts.update);
-//PostROuter.delete(Paths.Posts.Delete, PostsRouts.delete);
+PostROuter.put(Paths.Posts.Update, PostsRouts.update);
+PostROuter.delete(Paths.Posts.Delete, PostsRouts.delete);
 
 // Add UserRouter
 apiRouter.use(Paths.Users.Base, userRouter,);

@@ -1,6 +1,7 @@
 import { PostsInterface } from "@src/models/Posts";
 import { Userinterface } from "@src/models/Users";
 import { IPostDocument, IUserDocument, PostModel, UserModel } from "./MongooseSchema";
+import mongoose from "mongoose";
 import { Types } from 'mongoose';
 
 // **** Functions **** //
@@ -80,33 +81,36 @@ async function persists(postId: string): Promise<boolean> {
   }
 }
 
-
 /*Get one post.*/
 
 async function getOne(postId: string): Promise<{ post: PostsInterface | null, user: IUserDocument | null }> {
   try {
-    // Step 1: Get the post from the 'posts' collection by its ID
-    const post = await PostModel.findOne({ id: postId }).exec();  // Assuming `id` is the post identifier in the database
-    if (!post) {
-      throw new Error('Post not found');
-    }
-
-    // Step 2: Find the user that has the post inside their 'clothes' array
-    const user = await UserModel.findOne({ 'clothes.id': postId }).exec();  // Searching for the post inside the user's clothes array
+    // Buscar al usuario que tiene el post en su array de clothes
+    const user = await UserModel.findOne({ 'clothes.id': postId }).exec();
+    console.log(user);
     if (!user) {
       throw new Error('User not found for the given post');
     }
 
-    // Return both the post and the user
+    // Convertir el string `postId` a un ObjectId para buscar en la colección de posts
+    const idPostAsObjectId = new mongoose.Types.ObjectId(postId);
+
+    // Buscar el post en la colección de posts
+    const post = await PostModel.findOne({ _id: idPostAsObjectId }).exec();
+    if (!post) {
+      throw new Error('Post not found within user\'s clothes');
+    }
+
+    // Retornar el post y el usuario
     return {
-      post: post, // Convert Mongoose object to plain JavaScript object (without Mongoose methods)
+      post: post,
       user: user,
     };
   } catch (error) {
     console.error('Error fetching post and user:', error);
-    return { post: null, user: null }; // Return null if not found or an error occurs
+    return { post: null, user: null }; // Devolver null si no se encuentra o ocurre un error
   }
-}
+}//funciona todo menos update y delete. NO LO TOQUES MAS RETRASADO MENTAl
 
 
 
@@ -120,12 +124,76 @@ async function getAll(): Promise<IPostDocument[]> {
   }
 }
 
- async function add(post: PostsInterface): Promise<PostsInterface> {
-  const postDocument: Omit<IPostDocument, '_id' | 'id'> = toIPostDocument(post);
-  const createdPost = await PostModel.create(postDocument); // Add to the posts collection
-  return toPostInterface(createdPost); // Return the saved post
+async function add(post: PostsInterface): Promise<PostsInterface> {
+  try {
+    // Map `PostsInterface` to a Mongoose document and save it
+    const postDocument: Omit<IPostDocument, '_id' | 'id'> = toIPostDocument(post);
+    const createdPost = await PostModel.create(postDocument);
+    
+
+    // Convert the saved document to `PostsInterface` and return it
+    return toPostInterface(createdPost);
+  } catch (error) {
+    console.error('Error in PostsRepo adding post:', error);
+    throw new Error('Failed to add post to the database');
+  }
 }
 
+async function update(postId: string, updatedPostData: Partial<PostsInterface>): Promise<{ post: PostsInterface | null; user: Userinterface | null }> {
+  try {
+    // Step 1: Find and update the post in the posts collection
+    const updatedPost = await PostModel.findOneAndUpdate(
+      { _id: postId }, // Use `_id` for querying as defined in the PostsSchema
+      updatedPostData, // Apply the updates
+      { new: true } // Return the updated document
+    ).exec();
+
+    if (!updatedPost) {
+      throw new Error('Post not found or failed to update');
+    }
+
+    // Step 2: Find the user that has the post in their clothes array
+    const user = await UserModel.findOne({ 'clothes.id': postId }).exec();
+
+    if (!user) {
+      throw new Error('User not found for the given post');
+    }
+
+    // Return both the updated post and user
+    return { post: updatedPost.toObject(), user: user.toObject() };
+  } catch (error) {
+    console.error('Error in PostsRepo updating post and fetching user:', error);
+    return { post: null, user: null }; // Return null if an error occurs
+  }
+}
+
+
+async function delete_(postId: string): Promise<boolean> {
+  try {
+    const objectId = new mongoose.Types.ObjectId(postId);
+
+    // Step 1: Delete the post from the posts collection
+    const deleteResult = await PostModel.deleteOne({ _id: objectId }).exec();
+    if (deleteResult.deletedCount === 0) {
+      throw new Error("Post not found in posts collection");
+    }
+
+    // Step 2: Remove the post reference from the user's clothes array
+    const userUpdateResult = await UserModel.updateOne(
+      { "clothes.id": postId }, // Match the string ID
+      { $pull: { clothes: { id: postId } } } // Pull using the string ID
+    ).exec();
+
+    if (userUpdateResult.modifiedCount === 0) {
+      throw new Error("Post not found in user's clothes array");
+    }
+
+    return true; // Successful deletion
+  } catch (error) {
+    console.error("Error in PostsRepo deleting post:", error);
+    throw error;
+  }
+}
 
 
 
@@ -140,6 +208,6 @@ export default {
   getAll,
   getOne,
   add,
- // update,
-  //delete: delete_,
+  update, //hacer porque ni se si funciona
+  delete: delete_,
 } as const;

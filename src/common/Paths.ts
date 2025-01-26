@@ -9,6 +9,7 @@ export default {
     Update: '/update',
     Delete: '/delete/:id',
   },
+  
   Users2:{
     Base:'/useres',
     Get: '/all',
