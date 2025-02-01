@@ -63,11 +63,6 @@ function toIUserDocument(user: Userinterface): Omit<IUserDocument, '_id' | 'id'>
 }
 
 
-
-
-
-
-
 /* See if a user with the given id exists.*/
 async function persists(postId: string): Promise<boolean> {
   try {
@@ -87,7 +82,6 @@ async function getOne(postId: string): Promise<{ post: PostsInterface | null, us
   try {
     // Buscar al usuario que tiene el post en su array de clothes
     const user = await UserModel.findOne({ 'clothes.id': postId }).exec();
-    console.log(user);
     if (!user) {
       throw new Error('User not found for the given post');
     }
@@ -139,33 +133,56 @@ async function add(post: PostsInterface): Promise<PostsInterface> {
   }
 }
 
-async function update(postId: string, updatedPostData: Partial<PostsInterface>): Promise<{ post: PostsInterface | null; user: Userinterface | null }> {
-  try {
-    // Step 1: Find and update the post in the posts collection
+  async function update(postId: string, updatedPostData: Partial<PostsInterface>): Promise<{ post: PostsInterface | null; user: Userinterface | null }> {
+    try {
+
+    // Verificar si `postId` es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+      throw new Error(`Invalid postId: ${postId}`);
+    }
+
+    const idPostAsObjectId = new mongoose.Types.ObjectId(postId);
+    console.log('Updating post with ID:', idPostAsObjectId);
+
+    // Construir objeto con los campos que realmente tienen valores
+    const updateFields: Partial<PostsInterface> = {};
+    if (updatedPostData.title !== undefined) updateFields.title = updatedPostData.title;
+    if (updatedPostData.description !== undefined) updateFields.description = updatedPostData.description;
+    if (updatedPostData.price !== undefined) updateFields.price = updatedPostData.price;
+    if (updatedPostData.images !== undefined) updateFields.images = updatedPostData.images;
+    if (updatedPostData.createdAt !== undefined) updateFields.createdAt = updatedPostData.createdAt;
+
+    if (Object.keys(updateFields).length === 0) {
+      throw new Error('No valid fields to update in post');
+    }
+
+    // Actualizar la colección `posts`
     const updatedPost = await PostModel.findOneAndUpdate(
-      { _id: postId }, // Use `_id` for querying as defined in the PostsSchema
-      updatedPostData, // Apply the updates
-      { new: true } // Return the updated document
+      { _id: idPostAsObjectId },
+      { $set: updateFields },
+      { new: true }
     ).exec();
 
     if (!updatedPost) {
       throw new Error('Post not found or failed to update');
     }
 
-    // Step 2: Find the user that has the post in their clothes array
-    const user = await UserModel.findOne({ 'clothes.id': postId }).exec();
+    console.log('✅ Post updated:', updatedPost);
 
-    if (!user) {
-      throw new Error('User not found for the given post');
+      // Step 2: Find the user that has the post in their clothes array
+      const user = await UserModel.findOne({ 'clothes.id': postId }).exec();
+
+      if (!user) {
+        throw new Error('User not found for the given post');
+      }
+
+      // Return both the updated post and user
+      return { post: updatedPost.toObject(), user: user.toObject() };
+    } catch (error) {
+      console.error('Error in PostsRepo updating post and fetching user:', error);
+      return { post: null, user: null }; // Return null if an error occurs
     }
-
-    // Return both the updated post and user
-    return { post: updatedPost.toObject(), user: user.toObject() };
-  } catch (error) {
-    console.error('Error in PostsRepo updating post and fetching user:', error);
-    return { post: null, user: null }; // Return null if an error occurs
   }
-}
 
 
 async function delete_(postId: string): Promise<boolean> {

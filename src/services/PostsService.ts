@@ -74,39 +74,39 @@ async function add(post: PostsInterface, userId: string): Promise<PostsInterface
 
 async function update(postId: string, updatedPostData: Partial<PostsInterface>): Promise<{ post: PostsInterface | null; user: Userinterface | null }> {
   try {
-    // Step 1: Fetch the post and user with the given postId
-    const { post, user } = await PostsRepo.getOne(postId);
-    if (!post || !user) {
-      throw new Error('Post or user not found');
+    // Step 1: Update the post in the posts collection
+    const updatedPostResult = await PostsRepo.update(postId, updatedPostData);
+
+    if (!updatedPostResult.post) {
+      throw new Error('Failed to update post in posts collection');
     }
 
-    // Step 2: Update the specific post in the user's clothes array
+    // Step 2: Update the user's clothes array
     const updatedUser = await UserModel.findOneAndUpdate(
-      { 'clothes._id': postId }, // Match the specific post inside the user's clothes array
+      { 'clothes.id': postId },
       {
         $set: {
-          'clothes.$': {
-            ...post, // Current post data
-            ...updatedPostData, // Merge updated data
-            _id: postId, // Ensure `_id` remains unchanged
-          },
+          'clothes.$.title': updatedPostData.title,
+          'clothes.$.description': updatedPostData.description,
+          'clothes.$.price': updatedPostData.price,
+          'clothes.$.images': updatedPostData.images,
+          'clothes.$.createdAt': updatedPostData.createdAt,
         },
       },
-      { new: true } // Return the updated user document
+      { new: true }
     ).exec();
 
     if (!updatedUser) {
       throw new Error('Failed to update the post inside the user array');
     }
 
-    // Return the updated post and user
-    const updatedPost = { ...post, ...updatedPostData };
-    return { post: updatedPost as PostsInterface, user: updatedUser };
+    return { post: updatedPostResult.post, user: updatedUser.toObject() };
   } catch (error) {
     console.error('Error in PostService updating post and user:', error);
-    return { post: null, user: null }; // Return null if an error occurs
+    return { post: null, user: null };
   }
 }
+
 
 
  async function delete_ (postId: string): Promise<void> {

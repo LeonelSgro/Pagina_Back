@@ -2,9 +2,25 @@ import { getRandomInt } from '@src/util/misc';
 import { IUserDocument } from './MongooseSchema';
 import { UserModel } from './MongooseSchema';
 import { Console } from 'console';
+import bcrypt from 'bcrypt';
 
 
 // **** Functions **** //
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /** Check if a user with the given id exists */
 async function persists(id: string): Promise<boolean> {
@@ -42,6 +58,9 @@ async function getOne(id: string): Promise<IUserDocument | null> {
 /** Add a new user */
 async function add(user: Omit<IUserDocument, 'id' | '_id'>): Promise<IUserDocument | null> {
   try {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(user.password, saltRounds); 
+    user.password =hashedPassword;
     const newUser = new UserModel(user);
     const savedUser = await newUser.save();
     return savedUser;

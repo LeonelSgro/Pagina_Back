@@ -71,8 +71,6 @@ import check from './common/check';
   }
   
   
-  
-  
   /**
    * Delete one user.
    */

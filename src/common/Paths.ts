@@ -17,6 +17,7 @@ export default {
     Add: '/add',
     Update: '/update',
     Delete: '/delete/:id',
+    Login: '/login'
   },
   Posts:{
     Base: '/Posts',
