@@ -20,6 +20,7 @@ function toUserInterface(doc: any): Userinterface {
     name: doc.name,
     gmail: doc.gmail,
     password: doc.password,
+    phoneNumber: doc.phoneNumber,
     clothes: doc.clothes,
     Admin: doc.Admin,
   };
@@ -35,6 +36,7 @@ function toIUserDocument(user: Userinterface): Omit<IUserDocument, '_id' | 'id'>
     name: user.name,
     gmail: user.gmail,
     password: user.password,
+    phoneNumber: user.phoneNumber,
     clothes: user.clothes,
     Admin: user.Admin,
   });

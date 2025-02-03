@@ -36,32 +36,6 @@ function toIPostDocument(post: PostsInterface): Omit<IPostDocument, '_id' | 'id'
 }
 
 
-function toUserInterface(doc: any): Userinterface {
-  return {
-    id: doc._id.toString(), // Map MongoDB `_id` to `id` as string
-    name: doc.name,
-    gmail: doc.gmail,
-    password: doc.password,
-    clothes: doc.clothes,
-    Admin: doc.Admin,
-  };
-}
-
-/**
- * Map `Userinterface` to `IUserDocument` without `_id` or `id`.
- */
-
-function toIUserDocument(user: Userinterface): Omit<IUserDocument, '_id' | 'id'> {
-  // Create a new document using Mongoose Model (and omit id/_id for custom implementation)
-  return new UserModel({
-    name: user.name,
-    gmail: user.gmail,
-    password: user.password,
-    clothes: user.clothes,
-    Admin: user.Admin,
-  });
-}
-
 
 /* See if a user with the given id exists.*/
 async function persists(postId: string): Promise<boolean> {
@@ -107,7 +81,6 @@ async function getOne(postId: string): Promise<{ post: PostsInterface | null, us
 }//funciona todo menos update y delete. NO LO TOQUES MAS RETRASADO MENTAl
 
 
-
 async function getAll(): Promise<IPostDocument[]> {
   try {
     const posts = await PostModel.find();
@@ -124,7 +97,6 @@ async function add(post: PostsInterface): Promise<PostsInterface> {
     const postDocument: Omit<IPostDocument, '_id' | 'id'> = toIPostDocument(post);
     const createdPost = await PostModel.create(postDocument);
     
-
     // Convert the saved document to `PostsInterface` and return it
     return toPostInterface(createdPost);
   } catch (error) {

@@ -39,6 +39,7 @@ const UserSchema: Schema = new Schema(
     name: { type: String, required: true },
     gmail: { type: String, required: true, unique: true},
     password: { type: String, required: true },
+    phoneNumber: { type: Number, required: true },
     clothes: { type: [
       
           new Schema({
@@ -83,6 +84,7 @@ export interface IUserDocument extends Document {
   name: string;
   gmail: string;
   password: string;
+  phoneNumber: number;
   clothes: PostsInterface[];
   Admin: boolean;
 }

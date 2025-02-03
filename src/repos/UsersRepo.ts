@@ -1,26 +1,10 @@
-import { getRandomInt } from '@src/util/misc';
 import { IUserDocument } from './MongooseSchema';
 import { UserModel } from './MongooseSchema';
-import { Console } from 'console';
 import bcrypt from 'bcrypt';
 
 
 // **** Functions **** //
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*Aca tiene que ir el Log-in*/
 
 /** Check if a user with the given id exists */
 async function persists(id: string): Promise<boolean> {
@@ -85,8 +69,8 @@ async function update(data: { user: Partial<IUserDocument> & { id: string } }) {
     const updateData: Partial<IUserDocument> = {};
     if (user.name) updateData.name = user.name;
     if (user.gmail) updateData.gmail = user.gmail;
-    if (user.clothes) updateData.clothes = user.clothes;
-    if (user.Admin !== undefined) updateData.Admin = user.Admin;
+    if (user.phoneNumber) updateData.phoneNumber = user.phoneNumber;
+  
 
     // Actualizar el documento en la base de datos
     const updatedUser = await UserModel.findByIdAndUpdate(
@@ -123,7 +107,7 @@ async function delete_(id: string): Promise<boolean> {
 export default {
   persists,
   getAll,
-   getOne,
+  getOne,
   add,
   update,
   delete: delete_,

@@ -4,7 +4,7 @@ import Users from '@src/models/Users';
 
 import { IReq, IRes } from './common/types';
 import check from './common/check';
-import UserService from '@src/services/UserService';
+
 
 // **** Functions **** //
 
@@ -21,7 +21,6 @@ async function getAll(_: IReq, res: IRes) {
  */
 async function getOne(req: IReq, res: IRes) {
   const { id } = req.params;// Validating and extracting the ID from the URL
-  console.log(id)
   const user = await UsersService.getOne(String(id)); // Fetching the user by ID from UserService
   if (user) {
     res.status(HttpStatusCodes.OK).json({ user }); // Returning the user as a JSON response

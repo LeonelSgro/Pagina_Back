@@ -1,6 +1,3 @@
-import { RouteError } from '@src/common/classes';
-import HttpStatusCodes from '@src/common/HttpStatusCodes';
-import UserRepo from '@src/repos/UserRepo';
 import { Userinterface } from '@src/models/Users';
 import { PostsInterface } from '@src/models/Posts';
 import PostsRepo from '@src/repos/PostsRepo';
