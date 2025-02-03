@@ -6,6 +6,11 @@ import bcrypt from 'bcrypt';
 // **** Functions **** //
 /*Aca tiene que ir el Log-in*/
 
+
+
+
+
+
 /** Check if a user with the given id exists */
 async function persists(id: string): Promise<boolean> {
   try {
