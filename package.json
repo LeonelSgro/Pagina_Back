@@ -22,6 +22,7 @@
     "express-async-errors": "^3.1.1",
     "express-generator-typescript": "^2.4.25",
     "find": "^0.3.0",
+    "formidable": "^3.5.2",
     "fs-extra": "^11.2.0",
     "helmet": "^8.0.0",
     "inserturlparams": "^2.0.4",
@@ -33,6 +34,7 @@
     "moment": "^2.30.1",
     "mongoose": "^8.9.5",
     "morgan": "^1.10.0",
+    "superagent": "^10.1.1",
     "tsc-alias": "^1.8.10"
   },
   "devDependencies": {
