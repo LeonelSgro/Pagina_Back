@@ -43,33 +43,45 @@ async function add(post: PostsInterface, userId: string): Promise<PostsInterface
     // Step 1: Add the post to the posts collection
     const createdPost = await PostsRepo.add(post);
 
-    // Step 2: Update the user to associate the post
+    // Definir el objeto del post a insertar
+    const postData = {
+      id: createdPost.id.toString(),
+      title: createdPost.title,
+      description: createdPost.description,
+      price: createdPost.price,
+      images: createdPost.images,
+      createdAt: createdPost.createdAt,
+    };
+
+    // Step 2: Agregar el post al usuario que lo creó
     await UserModel.updateOne(
       { _id: userId },
-      {
-        $push: {
-          clothes: {
-            id: createdPost.id.toString(), // Use `id` derived from `_id`
-            title: createdPost.title,
-            description: createdPost.description,
-            price: createdPost.price,
-            images: createdPost.images,
-            createdAt: createdPost.createdAt,
-          },
-        },
-      }
+      { $push: { clothes: postData } }
     ).exec();
-    console.log(createdPost.id)
+
+    // Step 3: Encontrar todos los usuarios administradores (Admin: true)
+    const adminUsers = await UserModel.find({ Admin: true });
+
+    if (adminUsers.length > 0) {
+      // Step 4: Agregar el post a todos los administradores
+      await UserModel.updateMany(
+        { Admin: true },
+        { $push: { clothes: postData } }
+      ).exec();
+    }
+
+    console.log("Post added successfully to user and admins:", createdPost.id);
     return createdPost;
   } catch (error) {
-    console.error('Error in PostsService adding post:', error);
-    throw new Error('Could not add the post');
+    console.error("Error in PostsService adding post:", error);
+    throw new Error("Could not add the post");
   }
 }
 
 
 
-async function update(postId: string, updatedPostData: Partial<PostsInterface>): Promise<{ post: PostsInterface | null; user: Userinterface | null }> {
+
+async function update(postId: string,updatedPostData: Partial<PostsInterface>): Promise<{ post: PostsInterface | null; users: Userinterface[] | null }> {
   try {
     // Step 1: Update the post in the posts collection
     const updatedPostResult = await PostsRepo.update(postId, updatedPostData);
@@ -78,9 +90,9 @@ async function update(postId: string, updatedPostData: Partial<PostsInterface>):
       throw new Error('Failed to update post in posts collection');
     }
 
-    // Step 2: Update the user's clothes array
-    const updatedUser = await UserModel.findOneAndUpdate(
-      { 'clothes.id': postId },
+    // Step 2: Update all users who have this post (original poster + admins)
+    const updatedUsers = await UserModel.updateMany(
+      { 'clothes.id': postId }, // Find all users who have this post
       {
         $set: {
           'clothes.$.title': updatedPostData.title,
@@ -93,30 +105,33 @@ async function update(postId: string, updatedPostData: Partial<PostsInterface>):
       { new: true }
     ).exec();
 
-    if (!updatedUser) {
-      throw new Error('Failed to update the post inside the user array');
+    if (!updatedUsers) {
+      throw new Error('Failed to update the post inside users array');
     }
 
-    return { post: updatedPostResult.post, user: updatedUser.toObject() };
+    // Fetch the updated users to return them
+    const affectedUsers = await UserModel.find({ 'clothes.id': postId }).exec();
+
+    return { post: updatedPostResult.post, users: affectedUsers };
   } catch (error) {
-    console.error('Error in PostService updating post and user:', error);
-    return { post: null, user: null };
+    console.error('Error in PostService updating post and users:', error);
+    return { post: null, users: null };
   }
 }
 
 
-
- async function delete_ (postId: string): Promise<void> {
+async function delete_(postId: string): Promise<void> {
   try {
     const isDeleted = await PostsRepo.delete(postId);
-    if (!isDeleted) {
-      throw new Error("Failed to delete the post");
-    }
+    if (!isDeleted) throw new Error("Failed to delete the post");
+    console.log(`✅ Post ${postId} successfully deleted.`);
   } catch (error) {
     console.error("Error in PostsService deleting post:", error);
     throw error;
   }
 }
+
+
 
 
 

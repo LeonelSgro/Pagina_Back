@@ -2,7 +2,6 @@ import { PostsInterface } from "@src/models/Posts";
 import { Userinterface } from "@src/models/Users";
 import { IPostDocument, IUserDocument, PostModel, UserModel } from "./MongooseSchema";
 import mongoose from "mongoose";
-import { Types } from 'mongoose';
 
 // **** Functions **** //
 
@@ -105,56 +104,56 @@ async function add(post: PostsInterface): Promise<PostsInterface> {
   }
 }
 
-  async function update(postId: string, updatedPostData: Partial<PostsInterface>): Promise<{ post: PostsInterface | null; user: Userinterface | null }> {
-    try {
-
-    // Verificar si `postId` es un ObjectId válido
-    if (!mongoose.Types.ObjectId.isValid(postId)) {
-      throw new Error(`Invalid postId: ${postId}`);
-    }
-
-    const idPostAsObjectId = new mongoose.Types.ObjectId(postId);
-    console.log('Updating post with ID:', idPostAsObjectId);
-
-    // Construir objeto con los campos que realmente tienen valores
-    const updateFields: Partial<PostsInterface> = {};
-    if (updatedPostData.title !== undefined) updateFields.title = updatedPostData.title;
-    if (updatedPostData.description !== undefined) updateFields.description = updatedPostData.description;
-    if (updatedPostData.price !== undefined) updateFields.price = updatedPostData.price;
-    if (updatedPostData.images !== undefined) updateFields.images = updatedPostData.images;
-    if (updatedPostData.createdAt !== undefined) updateFields.createdAt = updatedPostData.createdAt;
-
-    if (Object.keys(updateFields).length === 0) {
-      throw new Error('No valid fields to update in post');
-    }
-
-    // Actualizar la colección `posts`
-    const updatedPost = await PostModel.findOneAndUpdate(
-      { _id: idPostAsObjectId },
-      { $set: updateFields },
-      { new: true }
-    ).exec();
-
-    if (!updatedPost) {
-      throw new Error('Post not found or failed to update');
-    }
-
-    console.log('✅ Post updated:', updatedPost);
-
-      // Step 2: Find the user that has the post in their clothes array
-      const user = await UserModel.findOne({ 'clothes.id': postId }).exec();
-
-      if (!user) {
-        throw new Error('User not found for the given post');
+async function update(postId: string, updatedPostData: Partial<PostsInterface>): Promise<{ post: PostsInterface | null; users: Userinterface[] | null }> {
+  try {
+      // Verify if `postId` is a valid ObjectId
+      if (!mongoose.Types.ObjectId.isValid(postId)) {
+          throw new Error(`Invalid postId: ${postId}`);
       }
 
-      // Return both the updated post and user
-      return { post: updatedPost.toObject(), user: user.toObject() };
-    } catch (error) {
-      console.error('Error in PostsRepo updating post and fetching user:', error);
-      return { post: null, user: null }; // Return null if an error occurs
-    }
+      const idPostAsObjectId = new mongoose.Types.ObjectId(postId);
+      console.log('Updating post with ID:', idPostAsObjectId);
+
+      // Build an update object only with fields that have values
+      const updateFields: Partial<PostsInterface> = {};
+      if (updatedPostData.title !== undefined) updateFields.title = updatedPostData.title;
+      if (updatedPostData.description !== undefined) updateFields.description = updatedPostData.description;
+      if (updatedPostData.price !== undefined) updateFields.price = updatedPostData.price;
+      if (updatedPostData.images !== undefined) updateFields.images = updatedPostData.images;
+      if (updatedPostData.createdAt !== undefined) updateFields.createdAt = updatedPostData.createdAt;
+
+      if (Object.keys(updateFields).length === 0) {
+          throw new Error('No valid fields to update in post');
+      }
+
+      // Update the `posts` collection
+      const updatedPost = await PostModel.findOneAndUpdate(
+          { _id: idPostAsObjectId },
+          { $set: updateFields },
+          { new: true }
+      ).exec();
+
+      if (!updatedPost) {
+          throw new Error('Post not found or failed to update');
+      }
+
+      console.log('✅ Post updated:', updatedPost);
+
+      // Step 2: Find all users who have this post (including admins)
+      const affectedUsers = await UserModel.find({ 'clothes.id': postId }).exec();
+
+      if (!affectedUsers || affectedUsers.length === 0) {
+          throw new Error('No users found with this post');
+      }
+
+      // Return both the updated post and all affected users
+      return { post: updatedPost.toObject(), users: affectedUsers.map(user => user.toObject()) };
+
+  } catch (error) {
+      console.error('Error in PostsRepo updating post and fetching users:', error);
+      return { post: null, users: null }; // Return null if an error occurs
   }
+}
 
 
 async function delete_(postId: string): Promise<boolean> {
@@ -163,26 +162,33 @@ async function delete_(postId: string): Promise<boolean> {
 
     // Step 1: Delete the post from the posts collection
     const deleteResult = await PostModel.deleteOne({ _id: objectId }).exec();
+    
     if (deleteResult.deletedCount === 0) {
       throw new Error("Post not found in posts collection");
     }
 
-    // Step 2: Remove the post reference from the user's clothes array
-    const userUpdateResult = await UserModel.updateOne(
-      { "clothes.id": postId }, // Match the string ID
-      { $pull: { clothes: { id: postId } } } // Pull using the string ID
+    console.log(`✅ Post ${postId} deleted from posts collection`);
+
+    // Step 2: Remove the post reference from all users (including admins)
+    const userUpdateResult = await UserModel.updateMany(
+      { "clothes.id": postId }, // Find all users who have the post
+      { $pull: { clothes: { id: postId } } } // Remove the post reference
     ).exec();
 
     if (userUpdateResult.modifiedCount === 0) {
-      throw new Error("Post not found in user's clothes array");
+      console.warn("⚠️ Post was not found in any user's clothes array");
+    } else {
+      console.log(`✅ Post ${postId} removed from ${userUpdateResult.modifiedCount} users`);
     }
 
     return true; // Successful deletion
+
   } catch (error) {
     console.error("Error in PostsRepo deleting post:", error);
     throw error;
   }
 }
+
 
 
 
