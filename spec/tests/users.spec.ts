@@ -11,6 +11,7 @@ import HttpStatusCodes from '@src/common/HttpStatusCodes';
 import Paths from '@src/common/Paths';
 import apiCb from 'spec/support/apiCb';
 import { TApiCb } from 'spec/types/misc';
+import mongoose from 'mongoose';
 
 // **** Tests **** //
 
@@ -21,7 +22,9 @@ describe('User and Mapa Endpoints', () => {
     agent = supertest.agent(app);
     done();
   });
-
+  afterAll(async () => {
+    await mongoose.disconnect();  // Close the MongoDB connection
+  });
   
 
   // **** User Tests **** //
