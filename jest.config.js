@@ -10,9 +10,8 @@ module.exports = {
     testMatch: [
       '**/spec/**/*.spec.ts',    // Adjust this to your folder structure for test files
     ],
-    moduleNameMapper: {
-      '^@src/(.*)$': '<rootDir>\\src\\$1',  // Usar \\ en lugar de / para Windows
-      '^spec/support/(.*)$': '<rootDir>\\spec\\support\\$1',
+      "moduleNameMapper": {
+        "/^@src\/(.*)$/": "/home/runner/work/Pagina_Back/Pagina_Back/src/$1"
     }
   };
   

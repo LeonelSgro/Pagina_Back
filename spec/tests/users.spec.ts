@@ -2,11 +2,9 @@
 import supertest, { Test } from 'supertest';
 import TestAgent from 'supertest/lib/agent';
 import insertUrlParams from 'inserturlparams';
-
 import app from '@src/server';
 import UsersRepo from '@src/repos/UsersRepo';
 import PostsRepo from '@src/repos/PostsRepo';
-
 import Users, {Userinterface} from '@src/models/Users';
 import Posts, {PostsInterface} from '@src/models/Posts';
 import HttpStatusCodes from '@src/common/HttpStatusCodes';
@@ -18,11 +16,14 @@ import { TApiCb } from 'spec/types/misc';
 
 describe('User and Mapa Endpoints', () => {
   let agent: TestAgent<Test>;
+  
 
   beforeAll(done => {
     agent = supertest.agent(app);
     done();
   });
+
+  
 
   // **** User Tests **** //
 
