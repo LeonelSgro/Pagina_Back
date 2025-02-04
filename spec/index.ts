@@ -6,7 +6,7 @@ import { argv } from 'process';
 
 // Init Jasmine
 const jasmine = new Jasmine();
-jasmine.exitOnCompletion = false;
+jasmine.exitOnCompletion = true;
 
 // Set location of test files
 jasmine.loadConfig({
