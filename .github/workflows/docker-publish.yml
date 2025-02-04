@@ -20,6 +20,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      mongo:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+
     steps:
       # Paso 1: Clonar el repositorio
       - name: Checkout repository
@@ -42,6 +54,12 @@ jobs:
       # Paso 5: Ejecutar pruebas
       - name: Run Tests
         run: npx jest
+
+
+
+
+
+
 
   build:
     runs-on: ubuntu-latest
