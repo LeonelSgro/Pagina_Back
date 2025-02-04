@@ -16,7 +16,6 @@ import { TApiCb } from 'spec/types/misc';
 
 describe('User and Mapa Endpoints', () => {
   let agent: TestAgent<Test>;
-  
 
   beforeAll(done => {
     agent = supertest.agent(app);

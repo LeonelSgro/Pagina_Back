@@ -53,7 +53,7 @@ jobs:
 
       # Paso 5: Ejecutar pruebas
       - name: Run Tests
-        run: npx jest
+        run: npx jest --detectOpenHandles
 
 
 
