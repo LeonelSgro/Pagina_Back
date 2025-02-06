@@ -1,21 +1,24 @@
-/**
- * Express router paths go here.
- */
+/* Express router paths go here. */
 
 export default {
   Base: '/api',
-  Users: {
-    Base: '/users',
+  
+  Users2:{
+    Base:'/useres',
     Get: '/all',
+    GetOne:'/getone/:id',
     Add: '/add',
     Update: '/update',
     Delete: '/delete/:id',
+    Login: '/login'
   },
-  Usuario: {
-    Base:'/usuarios',
-    Get:'',
-    Add:'',
-    Update:'',
-    Delete:'',
-  },
+  Posts:{
+    Base: '/Posts',
+    Get: '/all',
+    GetOne: "/getone/:id",
+    Add: '/add/:id',  
+    Update: '/update/:id',
+    Delete: '/delete/:id',
+  }
+
 } as const;
