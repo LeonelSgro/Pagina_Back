@@ -12,6 +12,7 @@ import childProcess from 'child_process';
     await remove('./dist/');
     await exec('npm run lint', './');
     await exec('tsc --build tsconfig.prod.json', './');
+    await exec("tsc-alias", "./");
     // Copy
     await copy('./src/public', './dist/public');
     await copy('./src/views', './dist/views');
