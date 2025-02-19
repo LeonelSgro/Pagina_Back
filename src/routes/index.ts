@@ -2,7 +2,7 @@ import { Router } from 'express';
 import Paths from '../common/Paths';
 import UsersRouts from './UsersRouts';
 import PostsRouts from './PostsRouts';
-
+import { verifyToken } from '@src/middleware/authenticate';
 
 // **** Variables **** //
 
@@ -17,18 +17,19 @@ const PostROuter = Router();
 
 
 // Get all users api
-UsersRouter.get(Paths.Users2.Get, UsersRouts.getAll);
-UsersRouter.get(Paths.Users2.GetOne, UsersRouts.getOne);
+UsersRouter.post(Paths.Users2.Login, UsersRouts.logIn)
+UsersRouter.get(Paths.Users2.Get,UsersRouts.getAll);
+UsersRouter.get(Paths.Users2.GetOne,verifyToken, UsersRouts.getOne);
 UsersRouter.post(Paths.Users2.Add, UsersRouts.add);
-UsersRouter.put(Paths.Users2.Update, UsersRouts.update);
-UsersRouter.delete(Paths.Users2.Delete, UsersRouts.delete);
+UsersRouter.put(Paths.Users2.Update,verifyToken, UsersRouts.update);
+UsersRouter.delete(Paths.Users2.Delete,verifyToken, UsersRouts.delete);
 
 // Get all posts api
 PostROuter.get(Paths.Posts.Get, PostsRouts.getAll);
 PostROuter.get(Paths.Posts.GetOne, PostsRouts.getOne);
-PostROuter.post(Paths.Posts.Add, PostsRouts.add);
-PostROuter.put(Paths.Posts.Update, PostsRouts.update);
-PostROuter.delete(Paths.Posts.Delete, PostsRouts.delete);
+PostROuter.post(Paths.Posts.Add,verifyToken, PostsRouts.add);
+PostROuter.put(Paths.Posts.Update,verifyToken, PostsRouts.update);
+PostROuter.delete(Paths.Posts.Delete,verifyToken, PostsRouts.delete);
 
 // Add UserRouter
 apiRouter.use(Paths.Users2.Base, UsersRouter,);

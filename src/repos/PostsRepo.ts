@@ -2,9 +2,10 @@ import { PostsInterface } from "@src/models/Posts";
 import { Userinterface } from "@src/models/Users";
 import { IPostDocument, IUserDocument, PostModel, UserModel } from "./MongooseSchema";
 import mongoose from "mongoose";
+import EnvVars from "@src/common/EnvVars";
+import { Jwt } from "jsonwebtoken";
 
 // **** Functions **** //
-
 
 /**
  * Map `IPostDocument` to `PostInterface`.
@@ -33,7 +34,6 @@ function toIPostDocument(post: PostsInterface): Omit<IPostDocument, '_id' | 'id'
     createdAt: post.createdAt,
   });
 }
-
 
 
 /* See if a user with the given id exists.*/

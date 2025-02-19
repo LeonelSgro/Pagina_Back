@@ -10,6 +10,9 @@ import { UserModel } from '@src/repos/MongooseSchema';   // Assuming your Mongoo
 export const USER_NOT_FOUND_ERR = 'User not found';
 
 // **** Helper Functions **** //
+function logIn(user: Userinterface): Promise<string> {
+  return UsersRepo.logIn(user);
+}
 
 /**
  * Map `IUserDocument` to `Userinterface`.
@@ -41,7 +44,6 @@ function toIUserDocument(user: Userinterface): Omit<IUserDocument, '_id' | 'id'>
     Admin: user.Admin,
   });
 }
-
 
 // **** Functions **** //
 
@@ -120,4 +122,5 @@ export default {
   addOne,
   updateOne,
   delete: _delete,
+  logIn: logIn
 } as const;

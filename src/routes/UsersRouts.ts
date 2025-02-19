@@ -9,6 +9,16 @@ import check from './common/check';
 // **** Functions **** //
 
 /**
+ * LogIn
+ */
+  async function logIn(req: IReq, res: IRes) {
+    const user = check.isValid(req.body, 'user', Users.isUser);
+    console.log(user)
+    const jwt = await UsersService.logIn(user);
+    res.status(HttpStatusCodes.OK).json({ jwt });
+  }
+
+/**
  * Get all users.
  */
 async function getAll(_: IReq, res: IRes) {
@@ -66,5 +76,6 @@ async function getOne(req: IReq, res: IRes) {
     add,
     update,
    delete: delete_,
+   logIn
   } as const;
   
