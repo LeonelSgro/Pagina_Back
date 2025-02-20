@@ -54,7 +54,7 @@ async function persists(postId: string): Promise<boolean> {
 async function getOne(postId: string): Promise<{ post: PostsInterface | null, user: IUserDocument | null }> {
   try {
     // Buscar al usuario que tiene el post en su array de clothes
-    const user = await UserModel.findOne({ 'clothes.id': postId }).exec();
+    const user = await UserModel.findOne({ 'clothes.id': postId , Admin: false}).exec();
     if (!user) {
       throw new Error('User not found for the given post');
     }
