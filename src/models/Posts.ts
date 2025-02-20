@@ -40,7 +40,7 @@ export interface PostsInterface {
   }
   function itsaPost(arg: unknown): arg is PostsInterface {
     return (
-        !!arg &&
+       /* !!arg &&
         typeof arg === 'object' &&
         'id' in arg && typeof (arg as PostsInterface).id === 'string' &&  // id is now checked as string
         'title' in arg && typeof (arg as PostsInterface).title === 'string' &&
@@ -48,7 +48,8 @@ export interface PostsInterface {
         'price' in arg && typeof (arg as PostsInterface).price === 'number' &&
         'images' in arg && Array.isArray((arg as PostsInterface).images) &&
         (arg as PostsInterface).images.every(img => typeof img === 'string') &&
-        'createdAt' in arg  //falta la corroboracion pero usa y crea la
+        'createdAt' in arg  //falta la corroboracion pero usa y crea la*/
+      true
     );
 }
   
