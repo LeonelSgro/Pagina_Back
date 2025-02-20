@@ -1,47 +1,29 @@
-import { CatInterface } from "./Category";
-
+import moment from 'moment';
 
 // **** Variables **** //
 
 const INVALID_CONSTRUCTOR_PARAM = 'nameOrObj arg must a string or an object ' + 
   'with the appropriate user keys.';
 
+    // **** Types **** //
 
-
- // **** Types **** //
-
-export interface PostsInterface {
+export interface CatInterface {
     id: number;
-    title: string;
-    description: string;
-    price: number;
-    images: String[];
-    createdAt: Date;
+    category: string;
   }
 
-
-  // **** Functions **** //
-  
   /* Create new User.*/
-  function new_(
-
-    title?:string,
-    description?: string,
-    price?: number,
-    images?: String[],
-    createdAt?: Date,
+function new_(
+    category?: string,  // Define category as a string
     id?: number, // id last cause usually set by db
-  ): PostsInterface{
+  ): CatInterface {
     return {
-      id: (id ?? -1),
-      title: (title ?? ''),
-      description: (description ?? ''),
-      price: (price ?? 0),
-      images: images ?? [],
-      createdAt: (createdAt ? new Date(createdAt) : new Date()),
+        id: (id ?? -1),
+        category: (category ?? ''),  // Default to an empty string
     };
   }
-  function itsaPost(arg: unknown): arg is PostsInterface {
+
+  function itsaCategory(arg: unknown): arg is CatInterface {
     return (
        /* !!arg &&
         typeof arg === 'object' &&
@@ -55,23 +37,18 @@ export interface PostsInterface {
       true
     );
 }
-  
-  /* Get user instance from object.*/
-  function from(param: object): PostsInterface {
-    if (itsaPost(param)) {
-      return new_(param.title, param.description, param.price, param.images, param.createdAt, param.id);
+   /* Get user instance from object.*/
+   function from(param: object): CatInterface {
+    if (itsaCategory(param)) {
+      return new_(param.category, param.id);
     }
     throw new Error(INVALID_CONSTRUCTOR_PARAM);
   }
-  
 
   // **** Export default **** //
-  
-  export default {
+
+export default {
     new: new_,
     from,
-    itsaPost,
+    itsaCategory,
   } as const;
-
-
-  

@@ -14,6 +14,7 @@ const apiRouter = Router();
 // Init router
 const UsersRouter = Router();
 const PostROuter = Router();
+const CategoryRouter = Router();
 
 
 // Get all users api

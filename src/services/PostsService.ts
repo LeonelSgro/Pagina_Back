@@ -58,18 +58,6 @@ async function add(post: PostsInterface, userId: string): Promise<PostsInterface
       { _id: userId },
       { $push: { clothes: postData } }
     ).exec();
-
-    // Step 3: Encontrar todos los usuarios administradores (Admin: true)
-    const adminUsers = await UserModel.find({ Admin: true });
-
-    if (adminUsers.length > 0) {
-      // Step 4: Agregar el post a todos los administradores
-      await UserModel.updateMany(
-        { Admin: true },
-        { $push: { clothes: postData } }
-      ).exec();
-    }
-
     console.log("Post added successfully to user and admins:", createdPost.id);
     return createdPost;
   } catch (error) {
@@ -77,8 +65,6 @@ async function add(post: PostsInterface, userId: string): Promise<PostsInterface
     throw new Error("Could not add the post");
   }
 }
-
-
 
 
 async function update(postId: string,updatedPostData: Partial<PostsInterface>): Promise<{ post: PostsInterface | null; users: Userinterface[] | null }> {

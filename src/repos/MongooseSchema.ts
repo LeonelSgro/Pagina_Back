@@ -3,12 +3,18 @@ import moment from 'moment';
 import { PostsInterface } from '@src/models/Posts';
 
 
+const CategorySchema: Schema = new Schema({
+  id: { type: String, required: true },
+  name: { type: String, required: true },
+}, { _id: false });
+
 // Define the Posts schema (for the 'clothes' field)
 const PostsSchema: Schema = new Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },
   images: { type: [String], default: [] },
+  category: { type: CategorySchema, required: true },
   createdAt: {
     type: Date,
     required: true,
@@ -89,8 +95,6 @@ export interface IUserDocument extends Document {
   Admin: boolean;
 }
 
-
-
 // Interface extending Mongoose Document for Post
 export interface IPostDocument extends Document {
   id: number;
@@ -100,6 +104,17 @@ export interface IPostDocument extends Document {
   images: String[];
   createdAt: Date;
 }
+
+export interface IcategoryDocument extends Document {
+  id: number;
+  category: string;
+}
+
+
+
+
+
+
 
 // Create Mongoose connection
 const db: Connection = mongoose.createConnection(
@@ -112,4 +127,5 @@ db.once('open', () => console.log('Database connected'));
 // Mongoose Models
 export const UserModel: Model<IUserDocument> = db.model<IUserDocument>('User', UserSchema);
 export const PostModel: Model<IPostDocument> = db.model<IPostDocument>('posts', PostsSchema);
+export const CatModel: Model<IcategoryDocument> = db.model<IcategoryDocument>('category', CategorySchema);
 
