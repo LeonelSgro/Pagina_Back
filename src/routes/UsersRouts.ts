@@ -1,81 +1,81 @@
-import HttpStatusCodes from '@src/common/HttpStatusCodes';
-import UsersService from '@src/services/UsersService';
-import Users from '@src/models/Users';
+import HttpStatusCodes from "@src/common/HttpStatusCodes";
+import Users from "@src/models/Users";
+import UsersService from "@src/services/UsersService";
 
-import { IReq, IRes } from './common/types';
-import check from './common/check';
-
+import check from "./common/check";
+import { IReq, IRes } from "./common/types";
 
 // **** Functions **** //
 
 /**
  * LogIn
  */
-  async function logIn(req: IReq, res: IRes) {
-    const user = check.isValid(req.body, 'user', Users.isUser);
-    console.log(user)
+async function logIn(req: IReq, res: IRes) {
+  const user = check.isValid(req.body, "user", Users.isUser);
+  console.log(user);
+  try {
     const jwt = await UsersService.logIn(user);
     res.status(HttpStatusCodes.OK).json({ jwt });
+  } catch (error) {
+    res.status(HttpStatusCodes.UNAUTHORIZED).json({ error });
   }
+}
 
 /**
  * Get all users.
  */
 async function getAll(_: IReq, res: IRes) {
-    const users = await UsersService.getAll();
-    res.status(HttpStatusCodes.OK).json({ users });
-  }
+  const users = await UsersService.getAll();
+  res.status(HttpStatusCodes.OK).json({ users });
+}
 
 /**
  * Get one user.
  */
 async function getOne(req: IReq, res: IRes) {
-  const { id } = req.params;// Validating and extracting the ID from the URL
+  const { id } = req.params; // Validating and extracting the ID from the URL
   const user = await UsersService.getOne(String(id)); // Fetching the user by ID from UserService
   if (user) {
     res.status(HttpStatusCodes.OK).json({ user }); // Returning the user as a JSON response
   } else {
-    res.status(HttpStatusCodes.NOT_FOUND).json({ message: 'User not found' }); // Handling case where user is not found
+    res.status(HttpStatusCodes.NOT_FOUND).json({ message: "User not found" }); // Handling case where user is not found
   }
 }
 
-  
-  /**
-   * Add one user.
-   */
-  async function add(req: IReq, res: IRes) {
-    const user = check.isValid(req.body, 'user', Users.isUser);
-    await UsersService.addOne(user);
-    res.status(HttpStatusCodes.CREATED).end();
-  }
-  
-  /**
-   * Update one user.
-   */
-  async function update(req: IReq, res: IRes) {
-    const user = check.isValid(req.body, 'user', Users.isUser);
-    await UsersService.updateOne(user);
-    res.status(HttpStatusCodes.OK).end();
-  }
-  
-  /**
-   * Delete one user.
-   */
-  async function delete_(req: IReq, res: IRes) {
-   // const id = check.isNum(req.params, 'id');
-    //await UsersService.delete(id);
-    //res.status(HttpStatusCodes.OK).end();
- }
-  
-  
-  // **** Export default **** //
-  
-  export default {
-    getAll,
-    getOne,
-    add,
-    update,
-   delete: delete_,
-   logIn
-  } as const;
-  
+/**
+ * Add one user.
+ */
+async function add(req: IReq, res: IRes) {
+  const user = check.isValid(req.body, "user", Users.isUser);
+  await UsersService.addOne(user);
+  res.status(HttpStatusCodes.CREATED).end();
+}
+
+/**
+ * Update one user.
+ */
+async function update(req: IReq, res: IRes) {
+  const user = check.isValid(req.body, "user", Users.isUser);
+  await UsersService.updateOne(user);
+  res.status(HttpStatusCodes.OK).end();
+}
+
+/**
+ * Delete one user.
+ */
+async function delete_(req: IReq, res: IRes) {
+  // const id = check.isNum(req.params, 'id');
+  //await UsersService.delete(id);
+  //res.status(HttpStatusCodes.OK).end();
+}
+
+// **** Export default **** //
+
+export default {
+  getAll,
+  getOne,
+  add,
+  update,
+  delete: delete_,
+  logIn,
+} as const;

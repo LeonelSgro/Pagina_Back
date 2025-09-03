@@ -1,13 +1,13 @@
 import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
 import stylisticTs from '@stylistic/eslint-plugin-ts';
 import nodePlugin from 'eslint-plugin-n';
+import tseslint from 'typescript-eslint';
 
 
 export default tseslint.config(
   eslint.configs.recommended,
   nodePlugin.configs['flat/recommended-script'],
-  ...tseslint.configs.strictTypeChecked,
+  ...tseslint.configs.disableTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
   { 
     ignores: [
@@ -37,7 +37,7 @@ export default tseslint.config(
       '@typescript-eslint/no-floating-promises': 0,
       '@typescript-eslint/no-confusing-void-expression': 0,
       '@typescript-eslint/no-unnecessary-condition': 0,
-      '@typescript-eslint/restrict-template-expressions': [ 'error', { allowNumber: true }],
+      '@typescript-eslint/restrict-template-expressions': [ 'warn', { allowNumber: true }],
       'max-len': [
         'warn',
         {

@@ -1,37 +1,35 @@
-import cookieParser from 'cookie-parser';
-import morgan from 'morgan';
-import path from 'path';
-import helmet from 'helmet';
-import express, { Request, Response, NextFunction } from 'express';
-import logger from 'jet-logger';
+import cookieParser from "cookie-parser";
+import express, { NextFunction, Request, Response } from "express";
+import "express-async-errors";
+import helmet from "helmet";
+import logger from "jet-logger";
+import morgan from "morgan";
+import path from "path";
 
-import 'express-async-errors';
+import BaseRouter from "@src/routes";
 
-import BaseRouter from '@src/routes';
-
-import Paths from '@src/common/Paths';
-import EnvVars from '@src/common/EnvVars';
-import HttpStatusCodes from '@src/common/HttpStatusCodes';
-import { RouteError } from '@src/common/classes';
-import { NodeEnvs } from '@src/common/misc';
-const cors = require('cors');
+import EnvVars from "@src/common/EnvVars";
+import HttpStatusCodes from "@src/common/HttpStatusCodes";
+import Paths from "@src/common/Paths";
+import { RouteError } from "@src/common/classes";
+import { NodeEnvs } from "@src/common/misc";
+const cors = require("cors");
 
 // **** Variables **** //
 
 const app = express();
 
-
 // **** Setup **** //
 
 // Basic middleware
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser(EnvVars.CookieProps.Secret));
 app.use(cors());
 
 // Show routes called in console during development
 if (EnvVars.NodeEnv === NodeEnvs.Dev.valueOf()) {
-  app.use(morgan('dev'));
+  app.use(morgan("dev"));
 }
 
 // Security
@@ -55,27 +53,28 @@ app.use((err: Error, _: Request, res: Response, next: NextFunction) => {
   return next(err);
 });
 
+//app.use(bodyParser.urlencoded({ limit: "50mb" }));
+//app.use(bodyParser.json({ limit: "50mb" }));
 
 // **** Front-End Content **** //
 
 // Set views directory (html)
-const viewsDir = path.join(__dirname, 'views');
-app.set('views', viewsDir);
+const viewsDir = path.join(__dirname, "views");
+app.set("views", viewsDir);
 
 // Set static directory (js and css).
-const staticDir = path.join(__dirname, 'public');
+const staticDir = path.join(__dirname, "public");
 app.use(express.static(staticDir));
 
 // Nav to users pg by default
-app.get('/', (_: Request, res: Response) => {
-  return res.redirect('/users');
+app.get("/", (_: Request, res: Response) => {
+  return res.redirect("/users");
 });
 
 // Redirect to login if not logged in.
-app.get('/users', (_: Request, res: Response) => {
-  return res.sendFile('users.html', { root: viewsDir });
+app.get("/users", (_: Request, res: Response) => {
+  return res.sendFile("users.html", { root: viewsDir });
 });
-
 
 // **** Export default **** //
 

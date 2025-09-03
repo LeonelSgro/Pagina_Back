@@ -1,13 +1,12 @@
-import { RouteError } from '@src/common/classes';
-import HttpStatusCodes from '@src/common/HttpStatusCodes';
-import UsersRepo from '@src/repos/UsersRepo';
-import { Userinterface } from '@src/models/Users';
-import { IUserDocument } from '@src/repos/MongooseSchema';  // Assuming IUserDocument is imported from somewhere
-import { UserModel } from '@src/repos/MongooseSchema';   // Assuming your Mongoose model is imported
+import { RouteError } from "@src/common/classes";
+import HttpStatusCodes from "@src/common/HttpStatusCodes";
+import { Userinterface } from "@src/models/Users";
+import { IUserDocument, UserModel } from "@src/repos/MongooseSchema"; // Assuming IUserDocument is imported from somewhere
+import UsersRepo from "@src/repos/UsersRepo";
 
 // **** Variables **** //
 
-export const USER_NOT_FOUND_ERR = 'User not found';
+export const USER_NOT_FOUND_ERR = "User not found";
 
 // **** Helper Functions **** //
 function logIn(user: Userinterface): Promise<string> {
@@ -22,6 +21,7 @@ function toUserInterface(doc: any): Userinterface {
     id: doc._id.toString(), // Map MongoDB `_id` to `id` as string
     name: doc.name,
     gmail: doc.gmail,
+    location: doc.location,
     password: doc.password,
     phoneNumber: doc.phoneNumber,
     clothes: doc.clothes,
@@ -33,7 +33,9 @@ function toUserInterface(doc: any): Userinterface {
  * Map `Userinterface` to `IUserDocument` without `_id` or `id`.
  */
 
-function toIUserDocument(user: Userinterface): Omit<IUserDocument, '_id' | 'id'> {
+function toIUserDocument(
+  user: Userinterface
+): Omit<IUserDocument, "_id" | "id"> {
   // Create a new document using Mongoose Model (and omit id/_id for custom implementation)
   return new UserModel({
     name: user.name,
@@ -62,13 +64,13 @@ async function getOne(id: string): Promise<Userinterface | null> {
     }
     return toUserInterface(user); // Convert the database document to `Userinterface`
   } catch (error) {
-    console.error('Error fetching user:', error);
-    throw new Error('Unable to fetch user'); // Throw an error if something goes wrong
+    console.error("Error fetching user:", error);
+    throw new Error("Unable to fetch user"); // Throw an error if something goes wrong
   }
 }
 
 /** Add one user */
-  async function addOne(user: Userinterface): Promise<void> {
+async function addOne(user: Userinterface): Promise<void> {
   const userDoc = toIUserDocument(user); // Ensure it's properly mapped
   await UsersRepo.add(userDoc); // Pass the validated and mapped object
 }
@@ -84,7 +86,7 @@ async function updateOne(user: Userinterface): Promise<void> {
       throw new RouteError(HttpStatusCodes.NOT_FOUND, USER_NOT_FOUND_ERR);
     }
 
-    const userDoc = { 
+    const userDoc = {
       id: user.id,
       name: user.name,
       gmail: user.gmail,
@@ -96,10 +98,10 @@ async function updateOne(user: Userinterface): Promise<void> {
     // Pasar el objeto en el formato esperado
     await UsersRepo.update({ user: userDoc });
   } catch (error) {
-    console.error('Error in updateOne:', error);
+    console.error("Error in updateOne:", error);
     throw new RouteError(
       HttpStatusCodes.INTERNAL_SERVER_ERROR,
-      error.message || 'Error updating user'
+      error.message || "Error updating user"
     );
   }
 }
@@ -114,6 +116,22 @@ async function _delete(id: string): Promise<void> {
   await UsersRepo.delete(id);
 }
 
+async function isUserAdmin(userId: string): Promise<boolean> {
+  try {
+    const user = await UsersRepo.getOne(userId);
+    if (!user) {
+      throw new RouteError(HttpStatusCodes.NOT_FOUND, USER_NOT_FOUND_ERR);
+    }
+    return user.Admin;
+  } catch (error) {
+    console.error("Error checking if user is admin:", error);
+    throw new RouteError(
+      HttpStatusCodes.INTERNAL_SERVER_ERROR,
+      error.message || "Error checking user admin status"
+    );
+  }
+}
+
 // **** Export default **** //
 
 export default {
@@ -121,6 +139,7 @@ export default {
   getOne,
   addOne,
   updateOne,
+  isUserAdmin,
   delete: _delete,
-  logIn: logIn
+  logIn: logIn,
 } as const;

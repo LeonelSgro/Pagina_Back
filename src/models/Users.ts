@@ -15,6 +15,7 @@ export interface Userinterface {
     gmail: string;
     password: string;
     phoneNumber: number;
+    location: string;
     clothes: PostsInterface[];
     Admin: boolean;
   }
@@ -29,11 +30,13 @@ function new_(
   gmail?: string,
   password?: string,
   phoneNumber?: number,
+  location?: string,
   clothes?: PostsInterface[], // Define clothes as an array of Posts
   id?: string, // id last cause usually set by db
 ): Userinterface {
   return {
     id: id ?? '',
+    location: location ?? '',
     name: name ?? '',
     gmail: gmail ?? '',
     phoneNumber: phoneNumber ?? 0,
@@ -53,6 +56,7 @@ function isUser(arg: unknown): arg is Userinterface {
     'name' in arg && typeof (arg as Userinterface).name === 'string' &&
     'password' in arg && typeof (arg as Userinterface).password === 'string' &&
     'phoneNumber' in arg && typeof (arg as Userinterface).phoneNumber === 'number' &&
+    'location' in arg && typeof (arg as Userinterface).location === 'string' &&
     'Admin' in arg && typeof (arg as Userinterface).Admin === 'boolean' &&
     'clothes' in arg && Array.isArray((arg as Userinterface).clothes) &&
     (arg as Userinterface).clothes.every(item => 
@@ -74,6 +78,7 @@ function from(param: object): Userinterface {
       param.gmail, 
       param.password, 
       param.phoneNumber,
+      param.location,
       param.clothes, // Pass the clothes array
       param.id
     );
